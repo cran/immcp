@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Author: Yuanlong Hu" />
+
+<meta name="date" content="2020-06-05" />
+
+<title>A Short Introduction to the immcp Package</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">A Short Introduction to the immcp Package</h1>
+<h4 class="author">Author: Yuanlong Hu</h4>
+<h4 class="date">2020-06-05</h4>
+
+
+
+<p>Traditional Chinese Medicine(TCM) has a history of more than 2000 years and has accumulated a great deal of clinical experience. The herbal prescription is one of the main treatment methods of traditional Chinese medicine. How to find a candidate prescription for a disease defined by modern medicine is an urgent problem to be solved.</p>
+<p>The pathway fingerprint (Ye, et.al,2012) is a method to indicate the profile of significant pathways being influenced by drugs, which may hint drug functions. Potential therapeutic prescription can be found based on the similarity of pathway fingerprints between disease and prescription.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(immcp)</a></code></pre></div>
+<p><code>drugSample</code> is a demo dataset, which contains two data frame and two vector:</p>
+<ul>
+<li>herb_target: The names and tagets of herbal prescription.</li>
+<li>disease_network: Disease network.</li>
+<li>disease_biomarker: Disease biomarkers.</li>
+<li>disease_biomarker_gsea: Disease biomarkers containing logFC values.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">data</span>(<span class="st">&quot;drugSample&quot;</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">str</span>(drugSample)</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co">#&gt; List of 4</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co">#&gt;  $ herb_target           :&#39;data.frame&#39;:  6633 obs. of  2 variables:</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co">#&gt;   ..$ prescription: chr [1:6633] &quot;YU_PING_FENG_SAN&quot; &quot;YU_PING_FENG_SAN&quot; &quot;YU_PING_FENG_SAN&quot; &quot;YU_PING_FENG_SAN&quot; ...</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="co">#&gt;   ..$ target      : chr [1:6633] &quot;AARS&quot; &quot;AARS2&quot; &quot;ABAT&quot; &quot;ABCB1&quot; ...</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="co">#&gt;  $ disease_network       :&#39;data.frame&#39;:  544 obs. of  2 variables:</span></a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">#&gt;   ..$ from: chr [1:544] &quot;HSPA5&quot; &quot;FOS&quot; &quot;FOS&quot; &quot;TRA2B&quot; ...</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="co">#&gt;   ..$ to  : chr [1:544] &quot;HSP90B1&quot; &quot;JUND&quot; &quot;JUNB&quot; &quot;HNRNPA2B1&quot; ...</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co">#&gt;  $ disease_biomarker     : chr [1:116] &quot;HSPA5&quot; &quot;FOS&quot; &quot;TRA2B&quot; &quot;JUN&quot; ...</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co">#&gt;  $ disease_biomarker_gsea: Named num [1:12444] 4.57 4.51 4.42 4.14 3.88 ...</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:12444] &quot;MMP1&quot; &quot;CDC45&quot; &quot;NMU&quot; &quot;CDCA8&quot; ...</span></a></code></pre></div>
+<p><code>extrFP()</code> can calculate the pathway fingerprints. The genesets contain <code>ImmGenTop150</code> and <code>KEGG</code>.</p>
+<ul>
+<li><code>geneset = &quot;ImmGenTop150&quot;</code>: The top 150(most overexpressed) and the bottom 150(most down-regulated) genes from ImmGen.</li>
+<li><code>geneset = &quot;KEGG&quot;</code>: KEGG pathawy(except “Human Diseases” and “Drug Development”)</li>
+</ul>
+<p>If the <code>disease_biomarker</code> is a a vector of gene symbol, you can use <code>method = &quot;enrich&quot;</code>, such as <code>disease_biomarker</code>. If the <code>disease_biomarker</code> is a a vector of logFC values named by gene symbol, you can use <code>method = &quot;enrich&quot;</code>, such as <code>disease_biomarker_gsea</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">FP &lt;-<span class="st"> </span><span class="kw">extrFP</span>(<span class="dt">disease_biomarker =</span> drugSample<span class="op">$</span>disease_biomarker,</a>
+<a class="sourceLine" id="cb3-2" title="2">             <span class="dt">drug_target =</span> drugSample<span class="op">$</span>herb_target,</a>
+<a class="sourceLine" id="cb3-3" title="3">             <span class="dt">method =</span> <span class="st">&quot;enrich&quot;</span>,</a>
+<a class="sourceLine" id="cb3-4" title="4">             <span class="dt">geneset =</span> <span class="st">&quot;ImmGenTop150&quot;</span>)</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">#&gt; Calculating pathway fingerprints of drug...</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt; Calculating pathway fingerprints of disease...</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt; Done...</span></a></code></pre></div>
+<p><code>score_fp()</code> can calculate the Tanimoto coefficient of pathway fingerprint between disease and prescription as score. The score is adjusted by permutation test. The results contain:</p>
+<ul>
+<li>score: Unadjusted score</li>
+<li>adj_score: Adjusted score</li>
+<li>p_value: p-value of permutation test</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">res &lt;-<span class="st"> </span><span class="kw">score_fp</span>(FP, <span class="dt">n =</span> <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co">#&gt; Calculating score...</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt; Summarizing all results...</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt; Done...</span></a>
+<a class="sourceLine" id="cb4-5" title="5">res1 &lt;-<span class="st"> </span><span class="kw">get_result</span>(res, <span class="dt">pvalueCutoff =</span> <span class="fl">0.05</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="kw">head</span>(res1)</a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="co">#&gt;                          Score adj_score p_value</span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="co">#&gt; ZHU_YE_SHI_GAO_TANG  0.1130742  3.600342  0.0099</span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt; BAN_XIA_XIE_XIN_TANG 0.1438356  3.518724  0.0099</span></a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="co">#&gt; BU_ZHONG_YI_QI_TANG  0.1308725  2.061093  0.0297</span></a></code></pre></div>
+<p>We can look at our distribution using <code>plot_density()</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">plot_density</span>(res, <span class="st">&quot;BAN_XIA_XIE_XIN_TANG&quot;</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
