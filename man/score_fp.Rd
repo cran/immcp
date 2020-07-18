@@ -7,11 +7,11 @@
 score_fp(FP, n = 100, two_tailed = TRUE)
 }
 \arguments{
-\item{FP}{A ScoreFP.}
+\item{FP}{a ScoreFP object}
 
 \item{n}{The number of permutations.}
 
-\item{two_tailed}{a logical: select a two-tailed p-value}
+\item{two_tailed}{whether returning a two-tailed p-value}
 }
 \value{
 ScoreResult
@@ -21,8 +21,11 @@ Calculate the pathway fingerprint.similarity between disease and prescription.
 }
 \examples{
 
-  data("drugSample")
+  data("drugResult")
   res <- score_fp(drugResult$demoFP, n=100)
+}
+\references{
+Ye, H., Tang, K., Yang, L., Cao, Z., & Li, Y. (2012). Study of drug function based on similarity of pathway fingerprint. Protein & cell, 3(2), 132-139.
 }
 \author{
 Yuanlong Hu

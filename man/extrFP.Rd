@@ -4,12 +4,7 @@
 \alias{extrFP}
 \title{extrFP}
 \usage{
-extrFP(
-  disease_biomarker,
-  drug_target,
-  method = "enrich",
-  geneset = "ImmGenTop150"
-)
+extrFP(disease_biomarker, drug_target, method = "enrich", geneset = "KEGG")
 }
 \arguments{
 \item{disease_biomarker}{A character of disease biomarkers or an order ranked geneList.}
@@ -32,7 +27,7 @@ Calculate the pathway fingerprints
   FP <- extrFP(disease_biomarker = drugSample$disease_biomarker,
                drug_target = drugSample$herb_target,
                method = "enrich",
-               geneset = "ImmGenTop150")
+               geneset = "KEGG")
 }
 \author{
 Yuanlong Hu

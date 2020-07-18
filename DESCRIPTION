@@ -1,6 +1,6 @@
 Package: immcp
 Title: Candidate Prescriptions Discovery Based on Pathway Fingerprint
-Version: 0.8.3
+Version: 0.9.1
 Authors@R: 
     person(given = "Yuanlong",
            family = "Hu",
@@ -14,14 +14,15 @@ RoxygenNote: 7.1.0
 biocViews:
 Depends: R (>= 3.5.0)
 Imports: igraph, proxyC, pbapply, Matrix, magrittr, stats, utils,
-        clusterProfiler, GSEABase, methods, ggplot2
+        clusterProfiler, GSEABase, methods, ggplot2, visNetwork,
+        RobustRankAggreg, reshape2, corrr, GSVA, Boruta
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 BugReports: https://github.com/YuanlongHu/immcp/issues
 URL: https://github.com/YuanlongHu/immcp
 NeedsCompilation: no
-Packaged: 2020-06-05 02:44:23 UTC; DELL
+Packaged: 2020-07-18 05:24:23 UTC; DELL
 Author: Yuanlong Hu [aut, cre]
 Maintainer: Yuanlong Hu <huyuanlong1996@163.com>
 Repository: CRAN
-Date/Publication: 2020-06-09 13:40:02 UTC
+Date/Publication: 2020-07-19 00:30:03 UTC
