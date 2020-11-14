@@ -7,7 +7,7 @@
 score_network(Tar, DNet, n = 100, two_tailed = TRUE)
 }
 \arguments{
-\item{Tar}{A list containing drug target.}
+\item{Tar}{A BasicData object containing drug target.}
 
 \item{DNet}{A data frame of disease network containing two columns.}
 
@@ -24,7 +24,12 @@ Calculate the network score
 \examples{
 
   data("drugSample")
-  res <- score_network(Tar = drugSample$herb_target, DNet = drugSample$disease_network)
+  drug_herb <- PrepareData(drugSample$drug_herb, col1 = "drug", col2 = "herb")
+  herb_target <- PrepareData(drugSample$herb_target,
+                             col1 = "herb", col2 = "target",
+                             format = "basket", sep = ", ")
+  drug_target <- CreateBasicData(drug_herb, herb_target)
+  res <- score_network(Tar = drug_target, DNet = drugSample$disease_network)
   res <- get_result(res)
 }
 \author{

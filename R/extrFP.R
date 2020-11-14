@@ -1,32 +1,30 @@
-#' Calculate the pathway fingerprints
-#'
-#'
-#' @title extrFP
+##' @rdname extrFP
+##' @exportMethod extrFP
+
+setMethod("extrFP", signature(drug_target = "BasicData"),
+          function(drug_target, disease_biomarker, method = "enrich") {
+            extrFP.BasicData(drug_target = drug_target, disease_biomarker=disease_biomarker, method = method)
+          })
+
+
+
+#' @rdname extrFP
 #' @param disease_biomarker A character of disease biomarkers or an order ranked geneList.
 #' @param drug_target A data frame or list of drug target.
 #' @param method one of "enrich" and "gsea"
-#' @param geneset one of "ImmGenTop150" and "KEGG"
 #' @return ScoreFP object
 #' @importFrom pbapply pblapply
 #' @importFrom clusterProfiler enricher
 #' @importFrom clusterProfiler GSEA
-#' @export
-#' @author Yuanlong Hu
-#' @examples
-#'
-#'   data("drugSample")
-#'   FP <- extrFP(disease_biomarker = drugSample$disease_biomarker,
-#'                drug_target = drugSample$herb_target,
-#'                method = "enrich",
-#'                geneset = "KEGG")
 
 
-extrFP <- function(disease_biomarker, drug_target, method = "enrich", geneset = "KEGG"){
+extrFP.BasicData <- function(drug_target, disease_biomarker, method = "enrich"){
 
-  if (geneset == "ImmGenTop150"){
-    geneset0 <- genesetlist$ImmGenTop150
-  }
+  Relationship <- drug_target@Relationship
+  CompoundAnno <- drug_target@CompoundAnno
+  drug_target <- drug_target@BasicData
 
+  geneset <- "KEGG"
   if (geneset == "KEGG"){
     geneset0 <- genesetlist$KEGGPATHID2EXTID
     geneset0 <- geneset0[!geneset0$from %in% genesetlist$KEGGPATHID2NAME_out,]
@@ -44,14 +42,14 @@ extrFP <- function(disease_biomarker, drug_target, method = "enrich", geneset = 
 
   if (class(geneset)== "data.frame") geneset0 <- geneset
 
-  if (class(drug_target)=="data.frame") drug_target <- to_list(drug_target)
+  #if (class(drug_target)=="data.frame") drug_target <- to_list(drug_target)
 
   enrich_f <- function(target_character, geneset = geneset0, method){
     names(geneset) <- c("c1", "c2")
     if (method=="enrich"){
        enrich_drug <- enricher(target_character,
                                TERM2GENE = geneset,
-                               minGSSize = 2, maxGSSize = Inf,
+                               minGSSize = 5, maxGSSize = 500,
                                pvalueCutoff = 0.05,
                                qvalueCutoff = 0.1)
        enrich_drug <- enrich_drug@result
@@ -61,7 +59,7 @@ extrFP <- function(disease_biomarker, drug_target, method = "enrich", geneset = 
       target_character <- sort(target_character,decreasing = TRUE)
        enrich_drug <- GSEA(target_character,
                            exponent = 1,
-                           minGSSize = 1, maxGSSize = Inf,
+                           minGSSize = 5, maxGSSize = 500,
                            pvalueCutoff = 0.05, pAdjustMethod = "BH",
                            TERM2GENE = geneset,
                            verbose = FALSE, seed = FALSE,
@@ -95,7 +93,9 @@ extrFP <- function(disease_biomarker, drug_target, method = "enrich", geneset = 
                       DiseaseBiomarker = disease_biomarker,
                       DrugTarget = drug_target,
                       FPType = "enrich",
-                      Geneset = geneset
+                      Geneset = geneset,
+                      Relationship = Relationship,
+                      CompoundAnno = CompoundAnno
                         )
   return(res_ScoreFP1)
 }
@@ -127,7 +127,7 @@ MoASim <- function(data, search=NULL, geneset){
     genelist <- sort(genelist,decreasing = TRUE)
     res <- suppressMessages(GSEA(genelist,
                                  exponent = 1,
-                                 minGSSize = 1, maxGSSize = Inf,
+                                 minGSSize = 5, maxGSSize = 500,
                                  pvalueCutoff = 1, pAdjustMethod = "BH",
                                  TERM2GENE = TERM2GENE,
                                  TERM2NAME = TERM2NAME,
@@ -153,39 +153,92 @@ MoASim <- function(data, search=NULL, geneset){
 ##' @title getF
 ##' @param expr A matrix of expression values where rows correspond to genes and columns correspond to samples.
 ##' @param pdata A character of phenotype.
+##' @param level one of the gene or pathway
 ##' @param geneset A data frame of geneset containing two columns.
 ##' @param withTentative If set to TRUE, Tentative attributes will be also returned.
 ##' @return A character of features.
 ##' @importFrom GSVA gsva
 ##' @importFrom Boruta Boruta
 ##' @importFrom Boruta getSelectedAttributes
-##' @noRd
+##' @export
 ##' @author Yuanlong Hu
 
-getF <- function(expr, pdata, geneset, withTentative = TRUE){
+getF <- function(expr, pdata, level = "gene", withTentative = TRUE, geneset){
   expr <- as.matrix(expr)
-  if (class(geneset)=="list") geneset
-  if (class(geneset) == "data.frame") geneset <- to_list(geneset)
 
-  cat("Run ssgsea \n")
-  res1 <- gsva(expr = expr,
-               gset.idx.list = geneset,
-               method = "ssgsea",
-               abs.ranking = FALSE,
-               min.sz = 1,
-               max.sz = Inf,
-               mx.diff = TRUE,
-               ssgsea.norm = TRUE,
-               verbose = TRUE,
-  )
+
+
+  if (level == "pathway"){
+    if (class(geneset)=="list") geneset
+    if (class(geneset) == "data.frame") geneset <- to_list(geneset)
+    message("Run ssgsea ...\n")
+    res1 <- gsva(expr = expr,
+                 gset.idx.list = geneset,
+                 method = "ssgsea",
+                 abs.ranking = FALSE,
+                 min.sz = 1,
+                 max.sz = Inf,
+                 mx.diff = TRUE,
+                 ssgsea.norm = TRUE,
+                 verbose = TRUE,
+    )
+  }
+
+  if (level == "gene"){
+    res1 <- expr
+  }
 
   res2 <- t(res1)
   res2 <- as.data.frame(res2)
   res2$group <- pdata
   res2$group <- factor(res2$group)
 
-  cat("Run Boruta \n")
+  message("Run Boruta ...\n")
+  set.seed(1234)
   res_B <- Boruta(group~.,data = res2,doTrace = 0)
   features <- getSelectedAttributes(res_B, withTentative = withTentative)
+
+  message("Done...")
   return(features)
+}
+
+
+##' Calculate differentially expressed genes using limma method.
+##'
+##'
+##' @title getDEG
+##' @param data A matrix of expression values where rows correspond to genes and columns correspond to samples.
+##' @param pdata A character vector of phenotype.
+##' @param contrasts character vector specifying contrasts
+##' @return A list
+##' @importFrom stats model.matrix
+##' @importFrom limma makeContrasts
+##' @importFrom limma lmFit
+##' @importFrom limma contrasts.fit
+##' @importFrom limma eBayes
+##' @importFrom limma topTable
+##' @importFrom magrittr %>%
+##' @export
+##' @author Yuanlong Hu
+
+getDEG <- function(data, pdata, contrasts){
+  Group <- factor(pdata)
+  design <- model.matrix(~0 + Group)
+  colnames(design) <- unique(pdata)
+
+  # Construct Matrix of Custom Contrasts
+  contrast_matrix <- makeContrasts(contrasts = contrasts,
+                                   levels = design)
+  fit <- lmFit(data, design) %>%
+    contrasts.fit(contrast_matrix) %>%
+    eBayes()
+
+  res_DEG0 <- NULL
+  for (i in 1:length(contrasts)) {
+    res_DEG <-  topTable(fit, adjust.method = "fdr", number = Inf, coef = i) %>%
+      list()
+    names(res_DEG) <- contrasts[i]
+    res_DEG0 <- c(res_DEG0, res_DEG)
+  }
+  return(res_DEG0)
 }

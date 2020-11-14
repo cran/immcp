@@ -4,6 +4,7 @@
 \alias{plot_network}
 \alias{plot_network,ScoreResultNet-method}
 \alias{plot_network,ScoreFP-method}
+\alias{plot_network,ScoreResultFP-method}
 \alias{plot_network.ScoreResultNet}
 \alias{plot_network.ScoreFP}
 \title{plot_network}
@@ -11,24 +12,41 @@
 plot_network(
   x,
   Drug,
-  node_color = c("orange", "lightblue"),
+  node_color = c("lightblue", "orange", "red", "green"),
   layout = "layout_nicely",
+  manipulation = FALSE,
   ...
 )
 
 \S4method{plot_network}{ScoreResultNet}(
   x,
   Drug,
-  node_color = c("orange", "lightblue"),
+  node_color = c("lightblue", "orange", "red", "green"),
   layout = "layout_nicely",
-  node_type = "target"
+  manipulation = FALSE,
+  node_type = "target",
+  background = "drug",
+  neighbor = FALSE
 )
 
 \S4method{plot_network}{ScoreFP}(
   x,
   Drug,
-  node_color = c("orange", "lightblue"),
+  node_type = "herb-compound-target",
+  node_color = c("lightblue", "orange", "red", "green"),
   layout = "layout_nicely",
+  manipulation = FALSE,
+  highlight = NULL,
+  width = FALSE
+)
+
+\S4method{plot_network}{ScoreResultFP}(
+  x,
+  Drug,
+  node_type = "herb-compound-target",
+  node_color = c("lightblue", "orange", "red", "green"),
+  layout = "layout_nicely",
+  manipulation = FALSE,
   highlight = NULL,
   width = FALSE
 )
@@ -36,16 +54,21 @@ plot_network(
 plot_network.ScoreResultNet(
   x,
   Drug,
-  node_color = c("orange", "lightblue"),
+  node_color = c("lightblue", "orange", "red", "green"),
   layout = "layout_nicely",
-  node_type = "target"
+  manipulation = FALSE,
+  node_type = "target",
+  background = "drug",
+  neighbor = FALSE
 )
 
 plot_network.ScoreFP(
   x,
   Drug,
-  node_color = c("orange", "lightblue"),
+  node_type = "herb-compound-pathway",
+  node_color = c("lightblue", "orange", "red", "green"),
   layout = "layout_nicely",
+  manipulation = FALSE,
   highlight = NULL,
   width = FALSE
 )
@@ -55,13 +78,19 @@ plot_network.ScoreFP(
 
 \item{Drug}{The name of drug.}
 
-\item{node_color}{The node color}
+\item{node_color}{The node color.}
 
 \item{layout}{Character Name of network layout function to use. Default to "layout_nicely".}
 
+\item{manipulation}{Whether to edit the network.}
+
 \item{...}{additional parameters}
 
-\item{node_type}{one of "target" or "all"}
+\item{node_type}{network type. one of "herb-target","herb-compound-target" and "target".}
+
+\item{background}{one of "drug" or "disease"}
+
+\item{neighbor}{logical.}
 
 \item{highlight}{A character vector of gene.}
 

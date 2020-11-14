@@ -14,17 +14,24 @@ data("drugSample")
 str(drugSample)
 
 ## -----------------------------------------------------------------------------
-FP <- extrFP(disease_biomarker = drugSample$disease_biomarker,
-             drug_target = drugSample$herb_target,
-             method = "enrich",
-             geneset = "KEGG")
+drug_herb <- PrepareData(drugSample$drug_herb, col1 = "drug", col2 = "herb")
+herb_target <- PrepareData(drugSample$herb_target, 
+                           col1 = "herb", col2 = "target", 
+                            format = "basket", sep = ", ")
+drug_target <- CreateBasicData(drug_herb, herb_target)
+
+## -----------------------------------------------------------------------------
+FP <- extrFP(drug_target = drug_target,
+             disease_biomarker = drugSample$disease_biomarker,
+             method = "enrich")
 
 
 ## -----------------------------------------------------------------------------
 res <- score_fp(FP, n = 100)
-res1 <- get_result(res, pvalueCutoff = 0.05)
-head(res1)
 
 ## -----------------------------------------------------------------------------
-plot_density(res, "BAN_XIA_XIE_XIN_TANG")
+get_result(res, pvalueCutoff = 0.05)
+
+## -----------------------------------------------------------------------------
+plot_density(res, "DANG_GUI_BU_XUE_TANG")
 

@@ -2,7 +2,7 @@
 #'
 #'
 #' @title score_network
-#' @param Tar A list containing drug target.
+#' @param Tar A BasicData object containing drug target.
 #' @param DNet A data frame of disease network containing two columns.
 #' @param n The number of times random permutation sampling.
 #' @param two_tailed a logical: select a two-tailed p-value.
@@ -18,13 +18,17 @@
 #' @examples
 #'
 #'   data("drugSample")
-#'   res <- score_network(Tar = drugSample$herb_target, DNet = drugSample$disease_network)
+#'   drug_herb <- PrepareData(drugSample$drug_herb, col1 = "drug", col2 = "herb")
+#'   herb_target <- PrepareData(drugSample$herb_target,
+#'                              col1 = "herb", col2 = "target",
+#'                              format = "basket", sep = ", ")
+#'   drug_target <- CreateBasicData(drug_herb, herb_target)
+#'   res <- score_network(Tar = drug_target, DNet = drugSample$disease_network)
 #'   res <- get_result(res)
 
 score_network <- function(Tar, DNet, n = 100, two_tailed = TRUE){
-
-  if(class(Tar) == "list") Tar
-  if(class(Tar) == "data.frame") Tar <- to_list(Tar)
+  Relationship <- Tar@Relationship
+  Tar <- Tar@BasicData
 
   score_network_s <- function(DNet, target, method = "all"){
 
@@ -72,7 +76,6 @@ score_network <- function(Tar, DNet, n = 100, two_tailed = TRUE){
     set.seed(1234)
     adj_total <- replicate(n, score_network_s(DNet = data.frame(node1 = sample(DNet[,1]), node2 = sample(DNet[,2]), stringsAsFactors = F), target = x, method = "total"))
     res <- c(marker, score, adj_total)
-
     res
   })
 
@@ -104,8 +107,96 @@ score_network <- function(Tar, DNet, n = 100, two_tailed = TRUE){
                          ScoreResult = as.data.frame(result),
                          DiseaseNetwork = DNet,
                          Tar = Tar,
+                         Relationship = Relationship,
                          adj = adj)
 
   return(res_ScoreResult)
+}
 
+
+
+##' @rdname imm_centr
+##' @exportMethod imm_centr
+
+setMethod("imm_centr", signature(x = "data.frame"),
+          function(x) {
+            imm_centr.data.frame(x)
+          })
+
+
+##' @rdname imm_centr
+##' @exportMethod imm_centr
+
+setMethod("imm_centr", signature(x = "ScoreResultNet"),
+          function(x, drug, node = "target", net = "disease") {
+            imm_centr.ScoreResultNet(x, drug, node = node, net = net)
+          })
+
+
+#' @rdname imm_centr
+#' @importFrom igraph degree
+#' @importFrom igraph closeness
+#' @importFrom igraph betweenness
+#' @importFrom igraph eigen_centrality
+#' @importFrom igraph V
+#' @author Yuanlong Hu
+
+
+imm_centr.data.frame <- function(x, node, net){
+  x <- as.data.frame(x)[,1:2]
+  names(x) <- c("from", "to")
+  g <- graph.data.frame(x, directed = F)
+
+  res <- list(
+    degree = degree(g, v = V(g), mode = "all"),
+    closeness = closeness(g, vids = V(g), mode = "all"),
+    betweenness = betweenness(g, v = V(g)),
+    eigen = eigen_centrality(g)$vector
+  )
+  res <- as.data.frame(res)
+  return(res)
+}
+
+#' @rdname imm_centr
+#' @param drug drug name
+#' @param node Nodes that need to be evaluated. one of "disease" and "target.
+#' @param net Network. one of "disease" and "target.
+#' @importFrom igraph degree
+#' @importFrom igraph closeness
+#' @importFrom igraph betweenness
+#' @importFrom igraph eigen_centrality
+#' @importFrom igraph V
+#' @author Yuanlong Hu
+
+imm_centr.ScoreResultNet <- function(x, drug, node, net){
+
+  g <- x@DiseaseNetwork
+  names(g) <- c("from", "to")
+
+  if (net == "target"){
+    Target <- x@ScoreResult[drug,"Target"]
+    Target <- strsplit(Target, split = ", ")[[1]]
+    g <- g[g$from %in% Target & g$to %in% Target,]
+  }
+
+  g <- graph.data.frame(g, directed = F)
+
+  res <- list(
+    degree = degree(g, v = V(g), mode = "all"),
+    closeness = closeness(g, vids = V(g), mode = "all"),
+    betweenness = betweenness(g, v = V(g)),
+    eigen = eigen_centrality(g)$vector
+  )
+
+  res <- as.data.frame(res)
+  if (node == "target"){
+    Target <- x@ScoreResult[drug,"Target"]
+    Target <- strsplit(Target, split = ", ")[[1]]
+    res <- res[Target,]
+
+  }
+
+
+  res <- res[order(res$degree, decreasing = T),]
+  return(res)
 }
