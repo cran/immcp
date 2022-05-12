@@ -4,33 +4,27 @@
 \alias{score_network}
 \title{score_network}
 \usage{
-score_network(Tar, DNet, n = 100, two_tailed = TRUE)
+score_network(BasicData, n = 1000)
 }
 \arguments{
-\item{Tar}{A BasicData object containing drug target.}
+\item{BasicData}{A BasicData object.}
 
-\item{DNet}{A data frame of disease network containing two columns.}
-
-\item{n}{The number of times random permutation sampling.}
-
-\item{two_tailed}{a logical: select a two-tailed p-value.}
+\item{n}{Number vector, the number of times random permutation sampling, default to 1000.}
 }
 \value{
-ScoreResultNet object
+A list.
 }
 \description{
-Calculate the network score
+Calculating differences in disease network characteristics before and after removal of drug targets
 }
 \examples{
-
-  data("drugSample")
-  drug_herb <- PrepareData(drugSample$drug_herb, col1 = "drug", col2 = "herb")
-  herb_target <- PrepareData(drugSample$herb_target,
-                             col1 = "herb", col2 = "target",
-                             format = "basket", sep = ", ")
-  drug_target <- CreateBasicData(drug_herb, herb_target)
-  res <- score_network(Tar = drug_target, DNet = drugSample$disease_network)
-  res <- get_result(res)
+data(drugdemo)
+drug_herb <- PrepareData(drugdemo$drug_herb, from = "drug", to="herb")
+herb_compound <- PrepareData(drugdemo$herb_compound, from = "herb", to="compound")
+compound_target <- PrepareData(drugdemo$compound_target, from = "compound", to="target")
+disease <- PrepareData(drugdemo$disease, diseaseID = "disease",from = "target", to="target")
+BasicData <- CreateBasicData(drug_herb, herb_compound, compound_target, diseasenet = disease)
+res <- score_network(BasicData, n = 100)
 }
 \author{
 Yuanlong Hu

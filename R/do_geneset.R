@@ -8,7 +8,10 @@
 #' @return list
 #' @author Yuanlong Hu
 #' @export
-
+#' @examples
+#' \dontrun{
+#'   to_list(dataframe)
+#' }
 
 to_list <- function(dataframe, input="single", sep = ", "){
   dataframe <- dataframe[,c(1,2)]
@@ -41,12 +44,14 @@ to_list <- function(dataframe, input="single", sep = ", "){
 #'
 #'
 #' @title to_df
-#' @param list a list containing gene sets
-#' @return data frame
+#' @param list A list containing gene sets.
+#' @return A data frame.
 #' @author Yuanlong Hu
 #' @export
-
-
+#' @examples
+#' \dontrun{
+#'   to_df(list)
+#' }
 
 to_df <- function(list){
   list0 <- NULL
@@ -59,12 +64,41 @@ to_df <- function(list){
   return(list0)
 }
 
+#' Convert BioDescr object to a list of adjacency matrix
+#'
+#'
+#' @title to_biodescr
+#' @param BioDescr A BioDescr object.
+#' @return A list.
+#' @importFrom igraph as_adjacency_matrix
+#' @importFrom igraph as_data_frame
+#' @author Yuanlong Hu
+#' @export
+#' @examples
+#' \dontrun{
+#'   to_biodescr(BioDescr)
+#' }
+
+to_biodescr <- function(BioDescr){
+
+  bd <- as_adjacency_matrix(BioDescr@drug_geneset,
+                            type = "both",
+                            sparse = FALSE)
+  v <- as_data_frame(BioDescr@drug_geneset, "vertices")
+  # bd_disease <- bd[v$name[v$type=="disease"], v$name[v$type=="pathway"]]
+  # bd_drug <- bd[v$name[v$type=="drug"], v$name[v$type=="pathway"]]
+
+  bd <- bd[v$name[v$type %in% c("disease", "drug")], v$name[v$type=="pathway"]]
+  bd <- list(bd = bd,
+             bd_type = v[v$type %in% c("disease", "drug"),])
+  return(bd)
+}
 
 #' prints data frame to a gmt file
 #'
 #'
 #' @title write_gmt
-#' @param geneset A data.frame of 2 column with term/drug and gene
+#' @param geneset A data.frame of 2 column with term/drug and gene.
 #' @param gmt_file A character of gmt file name.
 #' @return gmt file
 #' @export
@@ -90,19 +124,19 @@ write_gmt <- function(geneset, gmt_file){
 #'
 #' @title write_gmt
 #' @param gmtfile A GMT file name or URL containing gene sets.
-#' @param out_type A character vector of object name. one of "data.frame", "list", "GeneSetCollection"
-#' @return data.frame, list or GeneSetCollection
-#' @importFrom utils stack
-#' @importFrom GSEABase getGmt
+#' @param out_dataframe TRUE or FALSE
+#' @return data.frame, list
 #' @importFrom clusterProfiler read.gmt
 #' @export
 #' @author Yuanlong Hu
 
 
-read_gmt <- function(gmtfile, out_type = "data.frame"){
+read_gmt <- function(gmtfile, out_dataframe=TRUE){
 
- if (out_type == "list") geneset <- to_list(read.gmt(gmtfile))
- if (out_type == "data.frame") geneset <- read.gmt(gmtfile)
- if (out_type == "GeneSetCollection") geneset <- getGmt(gmtfile)
+ if (out_dataframe){
+   geneset <- read.gmt(gmtfile)
+ }else{
+   geneset <- to_list(read.gmt(gmtfile))
+ }
  return(geneset)
 }

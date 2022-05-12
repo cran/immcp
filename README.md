@@ -1,13 +1,15 @@
 
-# immcp: Candidate Prescriptions Discovery Based on Pathway Fingerprint
+# immcp: Polypharmacology Toolkit for Traditional Chinese Medicine Research
 [![](https://img.shields.io/cran/v/immcp?label=CRAN)](https://CRAN.R-project.org/package=immcp)
-[![](https://img.shields.io/badge/devel%20version-0.9.2-blue)](https://github.com/YuanlongHu/immcp)
+[![](https://img.shields.io/badge/devel%20version-1.0.1-blue)](https://github.com/YuanlongHu/immcp)
 [![](https://img.shields.io/github/license/YuanlongHu/immcp)](https://github.com/YuanlongHu/immcp/blob/master/LICENSE.md)
-[![](https://travis-ci.com/YuanlongHu/immcp.svg?branch=master)](https://travis-ci.com/github/YuanlongHu/immcp)
 [![](https://img.shields.io/github/repo-size/YuanlongHu/immcp)](https://github.com/YuanlongHu/immcp)
 
 
-This package implements the method proposed by *Ye* for pathway fingerprint. Candidate herbal prescriptions can be discovered based on the pathway fingerprint similarity between disease and prescriptions.
+This R package was a toolkit for TCM polypharmacology research. Based on the biological descriptors and drug-disease interaction networks, it can analyze the potential polypharmacological mechanisms of TCM and be used for drug repositioning in TCM. 
++ Extract biological descriptors by defining the genesets, and calculate the similarity of the drug to the disease characterized by the biological descriptors
++ Create and analyze Drug-Disease Network
+
 
 ## Installation
 You can install it from CRAN:
